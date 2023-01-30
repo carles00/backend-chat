@@ -12,3 +12,8 @@ const wss = new WebSocketServer({ httpServer: server });
 
 app.use(express.static('public'));
 
+//to launch
+app.listen(3000, function () {
+	console.log('Example app listening on port 3000!');
+});
+  
