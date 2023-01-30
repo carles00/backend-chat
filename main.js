@@ -1,8 +1,11 @@
 var express = require('express');
-var http = require("http");
+var http = require('http');
+var WebSocketServer = require('websocket').server;
 
+const app = express();
 
-server.listen(9024, function() {
-	console.log("Server ready!" );
-});
+//initialize a simple http server
+const server = http.createServer( app );
 
+//initialize the WebSocket server instance
+const wss = new WebSocket.Server({ httpServer: server });
