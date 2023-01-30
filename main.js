@@ -9,3 +9,5 @@ const server = http.createServer( app );
 
 //initialize the WebSocket server instance
 const wss = new WebSocket.Server({ httpServer: server });
+
+app.use(express.static('public'));
