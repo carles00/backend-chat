@@ -29,7 +29,7 @@ class Room {
         this.name = name;
         this.url = null;
         this.people = [];
-        this.range = [-100, 100];
+        this.range = [-240, 240];
     }
     
     addUser(user) {
@@ -59,7 +59,7 @@ var Render = {
     cam_offset: 0,
 
     init: function () {
-        this.current_room = WORLD.createRoom("hall", "background.png");
+        this.current_room = WORLD.createRoom("hall", "room.png");
 
         this.my_user = new User("user.png", "unnamed");
 
