@@ -23,13 +23,13 @@ function draw(){
 
     var context = canvas.getContext("2d");
 
-    MyApp.draw(canvas, context);
+    Render.draw(canvas, context);
 }
 
 
 
 function update(elapsed_time){
-    MyApp.update(elapsed_time);
+    Render.update(elapsed_time);
 }
 
 function getImage(url)
@@ -53,12 +53,12 @@ function onMouse( e ) {
     var canvasy = mouse_pos[1] = e.clientY - rect.top;
     mouse_buttons = e.buttons;
  
-    MyApp.onMouse(e);
+    Render.onMouse(e);
 };
 
 document.body.addEventListener("mousedown", onMouse );
 document.body.addEventListener("mousemove", onMouse );
 document.body.addEventListener("mouseup", onMouse );
 
-MyApp.init();
+Render.init();
 renderLoop();

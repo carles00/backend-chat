@@ -12,27 +12,31 @@ function lerp(a, b, f) {
     return a * (1 - f) + b * f;
 }
 
-function User() {
-    this.avatar = "user.png";
-    this.name = "unnamed";
-    this.position = 0;
-    this.facing = FACING_FRONT;
-    this.animation = "idle";
-    this.target = 0;
+class User {
+    constructor(url, name) {
+        this.avatar = url;
+        this.name = name;
+        this.position = 0;
+        this.facing = FACING_FRONT;
+        this.animation = "idle";
+        this.target = 0;
+    }
 }
 
-function Room(name) {
-    this.id = -1;
-    this.name = name;
-    this.url = null;
-    this.people = [];
-    this.range = [-100, 100];
+class Room {
+    constructor(name) {
+        this.id = -1;
+        this.name = name;
+        this.url = null;
+        this.people = [];
+        this.range = [-100, 100];
+    }
+    
+    addUser(user) {
+        this.people.push(user);
+        user.room = this;
+    }
 }
-
-Room.prototype.addUser = function (user) {
-    this.people.push(user);
-    user.room = this;
-};
 
 var WORLD = {
     last_id: 0,
@@ -49,7 +53,7 @@ var WORLD = {
     },
 };
 
-var MyApp = {
+var Render = {
     current_room: null,
     my_user: null,
     cam_offset: 0,
@@ -57,9 +61,10 @@ var MyApp = {
     init: function () {
         this.current_room = WORLD.createRoom("hall", "background.png");
 
-        this.my_user = new User();
+        this.my_user = new User("user.png", "unnamed");
 
         this.current_room.addUser(this.my_user);
+    
     },
 
     draw: function (canvas, ctx) {
@@ -124,17 +129,7 @@ var MyApp = {
     update: function (dt) {
         let room = this.current_room;
         room.people.forEach(user => {
-            
-        });
-        
-        if (this.my_user) {
-            let room = this.my_user.room;
-            this.my_user.target = clamp(
-                this.my_user.target,
-                room.range[0],
-                room.range[1]
-            );
-            let diff = this.my_user.target - this.my_user.position;
+            let diff = user.target - user.position;
             let delta = diff;
 
             if (delta > 0) {
@@ -144,24 +139,28 @@ var MyApp = {
             } else {
                 delta = 0;
             }
-
+            
             if (Math.abs(diff) < 1) {
-                this.my_user.position = this.my_user.target;
+                user.position = user.target;
             } else {
-                this.my_user.position += delta * dt;
+                user.position += delta * dt;
             }
 
             if (delta == 0) {
-                this.my_user.animation = "idle";
+                user.animation = "idle";
             } else {
-                this.my_user.animation = "walking";
+                user.animation = "walking";
                 if (delta < 1) {
-                    this.my_user.facing = FACING_LEFT;
+                    user.facing = FACING_LEFT;
                 } else {
-                    this.my_user.facing = FACING_RIGHT;
+                    user.facing = FACING_RIGHT;
                 }
             }
 
+        });
+
+        //cammera centered on my_user
+        if (this.my_user) {
             this.cam_offset = lerp(
                 this.cam_offset,
                 -this.my_user.position,
@@ -169,6 +168,7 @@ var MyApp = {
             );
         }
     },
+
 
     canvasToWorld: function (pos) {
         return [
@@ -180,7 +180,7 @@ var MyApp = {
     onMouse: function (e) {
         if (e.type == "mousedown") {
             let local_pos = this.canvasToWorld([mouse_pos[0], mouse_pos[1]]);
-            this.my_user.target = local_pos[0];
+            this.my_user.target = clamp(local_pos[0],this.current_room.range[0], this.current_room.range[1]);
         } else if (e.type == "mousemove") {
         } //mouseup
         else {
