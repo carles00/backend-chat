@@ -1,96 +1,16 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-<title>Chatter</title>
-<!-- Favicon -->
-<link rel="icon" type="image/vnd.microsoft.icon" href="img/favicon.ico">
-<!-- Boxicons CSS -->
-<link rel="stylesheet" type="text/css" href="https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css">
-<!-- CSS -->
-<link rel="stylesheet" type="text/css" href="css/style.css">
-<!-- SillyClient -->
-<script type="application/javascript" src="js/sillyclient.js" defer></script>
-<!-- JS -->
-<script type="application/javascript" src="js/script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
 </head>
-
 <body>
-  <!-- Login container -->
-  <div class="login">
-    <div class="login-content">
-      <img src="img/login-bg.jpg" alt="Login Background" class="login-bg">
-      <!-- Login form -->
-      <form class="login-form">
-        <!-- Login title -->
-        <div>
-          <h1 class="login-title">
-            <span>Welcome</span> Back
-          </h1>
-          <p class="login-description">
-            Welcome! Please login to continue.
-          </p>
-        </div>
-        <!-- Login inputs -->
-        <div>
-          <div class="login-inputs">
-            <div>
-              <label class="login-label">Username</label>
-              <input name="username" type="text" placeholder="Enter your username" required class="login-input">
-            </div>
-            <div>
-              <label class="login-label">Room</label>
-              <select name="room" class="login-input">
-                <option value="global">Global</option>
-                <option value="programming">Programming</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <!-- Login button -->
-        <div>
-          <button class="login-button">Log In</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Main container -->
-  <div class="container" style="display: none;">
-    <!-- Information header -->
-    <div class="header">
-      <div class="user-info"></div>
-    </div>
-    <!-- Chat zone -->
-    <div class="chat"></div>
-    <!-- Footer - User action buttons -->
-    <div class="footer">
-      <input class="user-input" type="text" placeholder="Type a message", name="user-input">
-      <div class="send-btn">
-        <i class="bx bx-send"></i>
-      </div>
-    </div>
-  </div>
-
-  <!-- Private container (generic) -->
-  <div id="private" class="container" style="display: none;">
-    <!-- Information header -->
-    <div class="header">
-      <div class="user-info"></div>
-      <div class="return-btn">
-        <i class="bx bx-arrow-back"></i>
-      </div>
-    </div>
-    <!-- Chat zone -->
-    <div class="chat"></div>
-    <!-- Footer - User action buttons -->
-    <div class="footer">
-      <input class="user-input" type="text" placeholder="Type a message", name="user-input">
-      <div class="send-btn">
-        <i class="bx bx-send"></i>
-      </div>
-    </div>
-  </div>
+    <canvas id="canvas"></canvas>
+    <script src="myApp.js"></script>
+    <script src="index.js"></script>
+    
 </body>
-
 </html>
