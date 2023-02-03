@@ -29,7 +29,7 @@ class Room {
         this.name = name;
         this.url = null;
         this.people = [];
-        this.range = [-240, 240];
+        this.range = [-240, 240, -64, 64]; //left right top bottom
     }
     
     addUser(user) {
@@ -180,7 +180,10 @@ var Render = {
     onMouse: function (e) {
         if (e.type == "mousedown") {
             let local_pos = this.canvasToWorld([mouse_pos[0], mouse_pos[1]]);
-            this.my_user.target = clamp(local_pos[0],this.current_room.range[0], this.current_room.range[1]);
+            //only move when clicking inside the room verticaly
+            if(local_pos[1] > this.current_room.range[2] && local_pos[1] < this.current_room.range[3]){
+                this.my_user.target = clamp(local_pos[0],this.current_room.range[0], this.current_room.range[1]);
+            }
         } else if (e.type == "mousemove") {
         } //mouseup
         else {

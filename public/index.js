@@ -1,4 +1,5 @@
 const canvas = document.getElementById('canvas');
+var chat_input = document.getElementById('chat-input');
 var last = performance.now();
 var mouse_pos = [0,0];
 var imgs = {};
@@ -59,6 +60,12 @@ function onMouse( e ) {
 document.body.addEventListener("mousedown", onMouse );
 document.body.addEventListener("mousemove", onMouse );
 document.body.addEventListener("mouseup", onMouse );
+
+chat_input.addEventListener('keyup', e => {
+    if (e.code === 'Enter') {
+      console.log(chat_input.value);
+    }
+});
 
 Render.init();
 renderLoop();
