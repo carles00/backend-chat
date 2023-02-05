@@ -1,1 +1,1 @@
-var socket = new WebSocket('ws://localhost:9024/');
+const socket = new WebSocket("ws://localhost:9024/ws");

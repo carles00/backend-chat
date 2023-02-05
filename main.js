@@ -1,43 +1,39 @@
-var express = require('express');
-var http = require('http');
-var WebSocketServer = require('websocket').server;
+const express = require('express');
+const http = require('http');
+const WebSocketServer = require('ws');
 
 const app = express();
 
-var port = process.argv[3] ? process.argv[3] : 9024;
-var webSocketUrl = process.argv[2] ? process.argv[2] : `https://ecv-etic.upf.edu/node/${port}/`
-
-
-
-//initialize a simple http server
-const server = http.createServer( app );
-
-//initialize the WebSocket server instance
-var wss = new WebSocketServer({ httpServer: server});
+const server = http.createServer(app);
+ 
+const wss = new WebSocketServer.Server({ server:server, path:"/ws"});
+ 
+const PORT = process.argv[2] ? process.argv[2] : 9024;
 
 app.use(express.static('public'));
-
-
-//to launch
-app.listen(port, function () {
-	console.log(`Chatter listening on port ${port}`);
+// Creating connection using websocket
+wss.on("connection", ws => {
+    console.log("new client connected");
+ 
+    // sending message to client
+    ws.send('Welcome, you are connected!');
+ 
+    //on message from client
+    ws.on("message", data => {
+        console.log(`Client has sent us: ${data}`)
+    });
+ 
+    // handling what to do when clients disconnects from server
+    ws.on("close", () => {
+        console.log("the client has disconnected");
+    });
+    // handling client connection error
+    ws.onerror = function () {
+        console.log("Some Error occurred")
+    }
 });
 
-
-  
-wss.on('request', function(request) {
-	console.log(request);
-	var connection = request.accept(null, request.origin);
-  
-	// This is the most important callback for us, we'll handle
-	// all messages from users here.
-	connection.on('message', function(message) {
-	  if (message.type === 'utf8') {
-		// process WebSocket message
-	  }
-	});
-  
-	connection.on('close', function(connection) {
-	  // close user connection
-	});
-  });
+server.listen(PORT, function(){
+	console.log(`HTTP listening on port ${PORT}`);
+	console.log(`WebSocketServer listening on url:${PORT}/ws`);
+})
