@@ -1,1 +1,1 @@
-const socket = new WebSocket("ws://localhost:9024/ws");
+const socket = new WebSocket("ws://localhost:9024/ws/");

@@ -41,7 +41,8 @@ class Room {
 var WORLD = {
     last_id: 0,
     rooms: [],
-    roomsById: {},
+    user: [],
+    usersByID: {},
     createRoom: function (name, url) {
         var room = new Room(name);
         room.id = this.last_id++;
