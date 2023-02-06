@@ -1,1 +1,3 @@
-# backend-chat
+# 2D Chat (backend + frontend)
+
+(...)
