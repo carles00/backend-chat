@@ -62,8 +62,8 @@ var Render = {
         this.current_room = WORLD.createRoom("hall", "room.png");
 
         this.my_user = new User("user.png", "unnamed");
-
         this.current_room.addUser(this.my_user);
+        this.current_room.addUser(new User("spritesheet.png", "otherUser"));
     
     },
 
