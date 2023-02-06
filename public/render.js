@@ -33,25 +33,30 @@ class Room {
     }
     
     addUser(user) {
-        this.people.push(user);
-        user.room = this;
+        this.people.push(user.name);
+        user.room = this.name;
     }
 }
 
 var WORLD = {
     last_id: 0,
     rooms: [],
-    user: [],
-    usersByID: {},
+    users: [],
+    userByID: {},
+    roomByID:{},
     createRoom: function (name, url) {
         var room = new Room(name);
         room.id = this.last_id++;
         room.url = url;
 
         this.rooms.push(room);
-
+        this.roomByID[room.name] = room;
         return room;
     },
+
+    addUser: function(user){
+        this.users.push(user);
+    }
 };
 
 var Render = {
