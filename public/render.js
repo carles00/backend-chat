@@ -20,6 +20,7 @@ class User {
         this.facing = FACING_FRONT;
         this.animation = "idle";
         this.target = 0;
+        this.room = null;
     }
 }
 
@@ -40,36 +41,44 @@ class Room {
 
 var WORLD = {
     last_id: 0,
-    rooms: [],
-    users: [],
     userByID: {},
     roomByID:{},
+    my_user: null,
+    current_room: null,
+
     createRoom: function (name, url) {
         var room = new Room(name);
         room.id = this.last_id++;
         room.url = url;
 
-        this.rooms.push(room);
         this.roomByID[room.name] = room;
         return room;
     },
 
-    addUser: function(user){
-        this.users.push(user);
+    addUser: function(user, room){
+        this.userByID[user.name] = user;
+        room.addUser(user)
+    },
+
+    getUser: function(name){
+        return this.userByID[name];
+    },
+
+    getRoom: function(name){
+        return this.roomByID[name];
     }
 };
 
 var Render = {
-    current_room: null,
-    my_user: null,
     cam_offset: 0,
 
     init: function () {
-        this.current_room = WORLD.createRoom("hall", "room.png");
+        WORLD.current_room = WORLD.createRoom("hall", "room.png");
 
-        this.my_user = new User("user.png", "unnamed");
-        this.current_room.addUser(this.my_user);
-        this.current_room.addUser(new User("spritesheet.png", "otherUser"));
+        WORLD.my_user = new User("user.png", "unnamed");
+        WORLD.addUser(WORLD.my_user, WORLD.current_room);
+        let testUser = new User("spritesheet.png", "otherUser");
+        WORLD.addUser(testUser, WORLD.current_room);
     
     },
 
@@ -84,8 +93,8 @@ var Render = {
         ctx.scale(SCALE, SCALE);
         ctx.translate(this.cam_offset, 0);
 
-        if (this.current_room) {
-            this.drawRoom(ctx, this.current_room);
+        if (WORLD.current_room) {
+            this.drawRoom(ctx, WORLD.current_room);
         }
 
         ctx.restore();
@@ -108,7 +117,8 @@ var Render = {
         talcking: [0, 1],
     },
 
-    drawUser: function (ctx, user) {
+    drawUser: function (ctx, userName) {
+        let user = WORLD.getUser(userName);
         if (!user.avatar) return;
 
         var anim = this.animations[user.animation];
@@ -133,8 +143,10 @@ var Render = {
     },
 
     update: function (dt) {
-        let room = this.current_room;
-        room.people.forEach(user => {
+        let room = WORLD.current_room;
+        room.people.forEach(user_ame => {
+            let user = WORLD.getUser(user_ame);
+
             let diff = user.target - user.position;
             let delta = diff;
 
@@ -166,10 +178,10 @@ var Render = {
         });
 
         //cammera centered on my_user
-        if (this.my_user) {
+        if (WORLD.my_user) {
             this.cam_offset = lerp(
                 this.cam_offset,
-                -this.my_user.position,
+                -WORLD.my_user.position,
                 0.07
             );
         }
@@ -187,8 +199,8 @@ var Render = {
         if (e.type == "mousedown") {
             let local_pos = this.canvasToWorld([mouse_pos[0], mouse_pos[1]]);
             //only move when clicking inside the room verticaly
-            if(local_pos[1] > this.current_room.range[2] && local_pos[1] < this.current_room.range[3]){
-                this.my_user.target = clamp(local_pos[0],this.current_room.range[0], this.current_room.range[1]);
+            if(local_pos[1] > WORLD.current_room.range[2] && local_pos[1] < WORLD.current_room.range[3]){
+                WORLD.my_user.target = clamp(local_pos[0],WORLD.current_room.range[0], WORLD.current_room.range[1]);
             }
         } else if (e.type == "mousemove") {
         } //mouseup
