@@ -40,7 +40,6 @@ class Room {
 }
 
 var WORLD = {
-    last_id: 0,
     userByID: {},
     roomByID:{},
     my_user: null,
@@ -48,7 +47,6 @@ var WORLD = {
 
     createRoom: function (name, url) {
         var room = new Room(name);
-        room.id = this.last_id++;
         room.url = url;
 
         this.roomByID[room.name] = room;
