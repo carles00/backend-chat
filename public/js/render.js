@@ -11,7 +11,6 @@ function clamp(v, min, max) {
 function lerp(a, b, f) {
     return a * (1 - f) + b * f;
 }
-
 class User {
     constructor(url, name) {
         this.avatar = url;
@@ -21,7 +20,19 @@ class User {
         this.animation = "idle";
         this.target = 0;
         this.room = null;
-    }
+        this.messages = []
+    };
+
+    newMessage(text){
+        if(this.messages.length === 3){
+            //remove oldest message
+            this.messages.pop();
+        }
+        //add to front of array
+        this.messages.unshift(text);
+
+        //TODO some kind of timer to remove messages after a while
+    };
 }
 
 class Room {
@@ -137,10 +148,25 @@ var Render = {
             32,
             64
         );
+
+        //TODO clean up code
         
-        ctx.fillStyle = 'black';
+        let messages = user.messages;
+        for(let i = 0; i<messages.length; i++){
+            ctx.font= "5px Arial";
+            let textSize = ctx.measureText(messages[i]);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(user.position - textSize.width/2, -32 - (10*i), textSize.width + 2, 8);
+            ctx.fillStyle = 'black'; 
+            ctx.fillText(messages[i],user.position - textSize.width/2, -26-(10*i));
+        }
+            
+        //write the name of the user
         ctx.font= "5px Arial";
-        ctx.fillText(user.name,user.position - 12, 48);
+        ctx.fillStyle = 'black'; 
+        let nameSize = ctx.measureText(user.name);
+        ctx.fillText(user.name,user.position - nameSize.width/2, 48);
+
     },
 
     update: function (dt) {
@@ -203,8 +229,8 @@ var Render = {
                 let local_pos = this.canvasToWorld([mouse_pos[0], mouse_pos[1]]); 
                 //only move when clicking inside the room verticaly
                 if(local_pos[1] > WORLD.current_room.range[2] && local_pos[1] < WORLD.current_room.range[3]){
-                WORLD.my_user.target = clamp(local_pos[0],WORLD.current_room.range[0], WORLD.current_room.range[1]);
-            }
+                    WORLD.my_user.target = clamp(local_pos[0],WORLD.current_room.range[0], WORLD.current_room.range[1]);
+                }
             }
             
         } else if (e.type == "mousemove") {
