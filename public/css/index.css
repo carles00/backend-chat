@@ -1,5 +1,5 @@
 html, body{
-    background-color: #555;
+    background-color: #202c33;
     height: 100%;
     width: 100%;
     overflow: hidden;
@@ -10,17 +10,119 @@ html, body{
     padding: 0;
 }
 
-#world {
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
+/* Grid setup */
+#main{
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: repeat(12, 1fr);
+    grid-template-columns: repeat(12, 1fr);
 }
 
-.user-input{
-    position: absolute;
-    left: 40%;
-    top: 80%;
-    width: 20%;
-    height: 4%;
+/* Canvas */
+#canvas-container{
+    overflow: hidden;
+    height: 100%;
+    grid-column: 1 / 10;
+    grid-row: 1/13;
 }
 
+/* Chat  */
+#chat-container{
+    grid-column: 10/13;
+    grid-row: 1/12;
+    background-color: #111b21;
+    overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+#chat::-webkit-scrollbar {
+    display: none;
+  }
+
+/* Message Input */ 
+#input-container{
+    grid-column: 10/13;
+    grid-row: 12/13;
+    background-color: #1a2329;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#user-input{
+    height: 60%;
+    width: 75%;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    padding-left: 10px;
+    color: #e9edef;
+    background-color: #2a3942;
+}
+
+#user-input:focus::placeholder{
+    color:transparent;
+}
+
+#send-btn {
+    margin-left: 10px;
+    width: 15%;
+    color: #7c8b95;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    scale: 1.5;
+}
+
+#send-btn:hover{
+    cursor: pointer;
+}
+
+/* icons */
+.material-symbols-rounded {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 48
+}
+
+/* Messages */ 
+.msg-line {
+    position: relative;
+    display: flex;
+    vertical-align: baseline;
+    flex-direction: column;
+    margin: 12px 0px 12px;
+    padding: 0px 57px 0px 71px;
+  }
+.msg-line-user {
+    align-items: flex-end;
+}
+.msg-line-other {
+    align-items: flex-start;
+}
+.msg-line-system {
+    align-items: center;
+}
+
+.msg {
+    color: #e9edef;
+    padding: 6px 7px 8px 9px;
+    border-radius: 10px;
+    max-width: 65%;
+  }
+  .msg-user {
+    background-color: #2e5d4b;
+  }
+  .msg-other {
+    background-color: #202c33;
+  }
+  .msg-system {
+    background-color: #202c33;
+  }
+  .msg > span {
+    max-width: 65%;
+    word-wrap: break-word;
+  }

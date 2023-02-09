@@ -4,6 +4,8 @@ var last = performance.now();
 var mouse_pos = [0,0];
 var imgs = {};
 
+var html = document.querySelector('html');
+
 function renderLoop(){
     draw();
 
@@ -17,11 +19,11 @@ function renderLoop(){
 }
 
 function draw(){
-    var parent = canvas.parentNode;
-	var rect = parent.getBoundingClientRect();
-	canvas.width = rect.width;
-	canvas.height = rect.height;
-
+    //for some reason using parent.getBoundingClientRect() caused the canvas to keep expanding
+	let htmlRect = html.getBoundingClientRect();
+    let parentRect = canvas.parentNode.getBoundingClientRect();
+	canvas.width =  parentRect.width;
+	canvas.height = htmlRect.height;
     var context = canvas.getContext("2d");
 
     Render.draw(canvas, context);
@@ -60,12 +62,6 @@ function onMouse( e ) {
 document.body.addEventListener("mousedown", onMouse );
 document.body.addEventListener("mousemove", onMouse );
 document.body.addEventListener("mouseup", onMouse );
-
-chat_input.addEventListener('keyup', e => {
-    if (e.code === 'Enter') {
-      console.log(chat_input.value);
-    }
-});
 
 Render.init();
 renderLoop();

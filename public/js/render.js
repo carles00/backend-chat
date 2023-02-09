@@ -46,7 +46,7 @@ var WORLD = {
     current_room: null,
 
     createRoom: function (name, url) {
-        var room = new Room(name);
+        let room = new Room(name);
         room.url = url;
 
         this.roomByID[room.name] = room;
@@ -69,6 +69,12 @@ var WORLD = {
 
 var Render = {
     cam_offset: 0,
+    
+    animations: {
+        idle: [0],
+        walking: [2, 3, 4, 5, 6, 7, 8, 9],
+        talcking: [0, 1],
+    },
 
     init: function () {
         WORLD.current_room = WORLD.createRoom("hall", "room.png");
@@ -83,8 +89,6 @@ var Render = {
     draw: function (canvas, ctx) {
         ctx.imageSmoothingEnabled = false;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = "red";
 
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -109,17 +113,12 @@ var Render = {
         }
     },
 
-    animations: {
-        idle: [0],
-        walking: [2, 3, 4, 5, 6, 7, 8, 9],
-        talcking: [0, 1],
-    },
-
+    
     drawUser: function (ctx, userName) {
         let user = WORLD.getUser(userName);
         if (!user.avatar) return;
 
-        var anim = this.animations[user.animation];
+        let anim = this.animations[user.animation];
 
         if (!anim) return;
 
@@ -138,12 +137,16 @@ var Render = {
             32,
             64
         );
+        
+        ctx.fillStyle = 'black';
+        ctx.font= "5px Arial";
+        ctx.fillText(user.name,user.position - 12, 48);
     },
 
     update: function (dt) {
         let room = WORLD.current_room;
-        room.people.forEach(user_ame => {
-            let user = WORLD.getUser(user_ame);
+        room.people.forEach(user_name => {
+            let user = WORLD.getUser(user_name);
 
             let diff = user.target - user.position;
             let delta = diff;
@@ -195,11 +198,15 @@ var Render = {
 
     onMouse: function (e) {
         if (e.type == "mousedown") {
-            let local_pos = this.canvasToWorld([mouse_pos[0], mouse_pos[1]]);
-            //only move when clicking inside the room verticaly
-            if(local_pos[1] > WORLD.current_room.range[2] && local_pos[1] < WORLD.current_room.range[3]){
+            //only process clicks inside canvas
+            if(mouse_pos[0]< canvas.getBoundingClientRect().width){
+                let local_pos = this.canvasToWorld([mouse_pos[0], mouse_pos[1]]); 
+                //only move when clicking inside the room verticaly
+                if(local_pos[1] > WORLD.current_room.range[2] && local_pos[1] < WORLD.current_room.range[3]){
                 WORLD.my_user.target = clamp(local_pos[0],WORLD.current_room.range[0], WORLD.current_room.range[1]);
             }
+            }
+            
         } else if (e.type == "mousemove") {
         } //mouseup
         else {
