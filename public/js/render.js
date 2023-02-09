@@ -4,6 +4,8 @@ var FACING_LEFT = 2;
 var FACING_BACK = 3;
 var SCALE = 4;
 var SPEED = 40;
+var TIMEOUT_MESSAGES = 10000;
+var MAX_MESSAGES = 3;
 
 function clamp(v, min, max) {
     return v < min ? min : v > max ? max : v;
@@ -24,14 +26,24 @@ class User {
     };
 
     newMessage(text){
-        if(this.messages.length === 3){
+        //only last messages shown on canvas
+        if(this.messages.length === MAX_MESSAGES){
             //remove oldest message
             this.messages.pop();
         }
         //add to front of array
         this.messages.unshift(text);
 
-        //TODO some kind of timer to remove messages after a while
+        //timer that removes the message after a while
+        this.timeoutMessage(TIMEOUT_MESSAGES).then(()=>{
+            this.messages.pop();
+        });
+    };
+
+    timeoutMessage(ms){
+        return new Promise(function(resolve){
+            setTimeout(resolve, ms);
+        })
     };
 }
 
@@ -150,7 +162,7 @@ var Render = {
         );
 
         //TODO clean up code
-        
+        //draw messages
         let messages = user.messages;
         for(let i = 0; i<messages.length; i++){
             ctx.font= "5px Arial";
