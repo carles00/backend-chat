@@ -1,21 +1,44 @@
-const socket = new WebSocket("ws://ecv-etic.upf.edu/node/9024/ws");
+const server = new WebSocket("ws://ecv-etic.upf.edu/node/9024/ws");
 
-const msgs = [];
-const msg_history = {
-  type: 'history',
-  content: msgs
-};
-const colors = [
-  '#25d366',
-  '#53a6fd',
-  '#e26ab6',
-  '#fc9775',
-  '#ffbc38'
-];
+const colors = ["#25d366", "#53a6fd", "#e26ab6", "#fc9775", "#ffbc38"];
+
+class Message{
+	constructor(type, content, userName){
+		this.type = type;
+		this.content = content;
+		this.userName = userName;
+	}
+}
+
 let room = null;
-let user_id = null;
-let user_name = null;
+let userId = null;
+let userName = null;
 
-const chat = document.getElementById('chat-container');
-const input = document.getElementById('user-input');
-const send_btn = document.getElementById('send-btn');
+var CHAT = {
+	input: null,
+    send_button: null,
+
+    init: function () {
+		this.input = document.getElementById("user-input");
+		this.send_button = document.getElementById("send-btn");
+
+		this.input.addEventListener('keyup', e =>{
+			if(e.key === "Enter"){
+				this.sendMessage();
+			}
+		});
+
+		//TODO connect to server
+
+	},
+
+	sendMessage: function(){
+		console.log(this.input.value);
+		let messageToSend = new Message("text", this.input.value, userName);
+		WORLD.sendMessage(messageToSend.content);
+		//TODO Send to server
+		this.input.value = '';
+	}
+};
+
+CHAT.init();

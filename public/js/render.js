@@ -87,6 +87,9 @@ var WORLD = {
 
     getRoom: function(name){
         return this.roomByID[name];
+    },
+    sendMessage: function(text){
+        this.my_user.newMessage(text);
     }
 };
 
@@ -104,9 +107,6 @@ var Render = {
 
         WORLD.my_user = new User("user.png", "unnamed");
         WORLD.addUser(WORLD.my_user, WORLD.current_room);
-        let testUser = new User("spritesheet.png", "otherUser");
-        WORLD.addUser(testUser, WORLD.current_room);
-    
     },
 
     draw: function (canvas, ctx) {
@@ -161,14 +161,15 @@ var Render = {
             64
         );
 
-        //TODO clean up code
         //draw messages
         let messages = user.messages;
         for(let i = 0; i<messages.length; i++){
             ctx.font= "5px Arial";
             let textSize = ctx.measureText(messages[i]);
+            //text background
             ctx.fillStyle = 'white';
-            ctx.fillRect(user.position - textSize.width/2, -32 - (10*i), textSize.width + 2, 8);
+            ctx.fillRect(user.position - (textSize.width/2) - 1, -32 - (10*i), textSize.width + 2, 8);
+            //text
             ctx.fillStyle = 'black'; 
             ctx.fillText(messages[i],user.position - textSize.width/2, -26-(10*i));
         }
