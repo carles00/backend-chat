@@ -23,13 +23,13 @@ html, body{
     overflow: hidden;
     height: 100%;
     grid-column: 1 / 13;
-    grid-row: 1/9;
+    grid-row: 1/10;
 }
 
 /* Message Input */ 
 #input-container{
     grid-column: 1/13;
-    grid-row: 9/11;
+    grid-row: 10/11;
     background-color: #1a2329;
     display: flex;
     align-items: center;
@@ -74,41 +74,3 @@ html, body{
     'opsz' 48
 }
 
-/* Messages */ 
-.msg-line {
-    position: relative;
-    display: flex;
-    vertical-align: baseline;
-    flex-direction: column;
-    margin: 12px 0px 12px;
-    padding: 0px 57px 0px 71px;
-  }
-.msg-line-user {
-    align-items: flex-end;
-}
-.msg-line-other {
-    align-items: flex-start;
-}
-.msg-line-system {
-    align-items: center;
-}
-
-.msg {
-    color: #e9edef;
-    padding: 6px 7px 8px 9px;
-    border-radius: 10px;
-    max-width: 65%;
-  }
-  .msg-user {
-    background-color: #2e5d4b;
-  }
-  .msg-other {
-    background-color: #202c33;
-  }
-  .msg-system {
-    background-color: #202c33;
-  }
-  .msg > span {
-    max-width: 65%;
-    word-wrap: break-word;
-  }

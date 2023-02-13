@@ -6,7 +6,9 @@ var SCALE = 4;
 var SPEED = 40;
 var TIMEOUT_MESSAGES = 10000;
 var MAX_MESSAGES = 3;
-var DEBUG = false;
+var EXIT_SIGN_Y = -48;
+var EXIT_SIGN_HEIGHT = 10;
+var DEBUG = true;
 
 function clamp(v, min, max) {
     return v < min ? min : v > max ? max : v;
@@ -49,18 +51,28 @@ class User {
 }
 
 class Room {
-    constructor(name,url,exitPositions) {
+    constructor(name,url) {
         this.id = -1;
         this.name = name;
         this.url = url;
         this.people = [];
         this.range = [-240, 240, -64, 64]; //left right top bottom
-        this.exitPositions = exitPositions;
+        this.exits = [];
+        this.verticalOffset = 0;
     }
     
     addUser(user) {
         this.people.push(user.name);
         user.room = this.name;
+    }
+
+    addExit(range, roomName){
+        let exit = {
+            range: range,
+            roomName: roomName,
+            active: false
+        };
+        this.exits.push(exit);
     }
 }
 
@@ -101,12 +113,19 @@ var Render = {
     },
 
     init: function () {
-        let room = new Room("home","room.png",[125,-125]);
+        let room = new Room("user_Name_Home","assets/room1.png");
         WORLD.addRoom(room);
         WORLD.current_room = room;
 
-        WORLD.my_user = new User("user.png", "unnamed");
+        WORLD.my_user = new User("assets/userA.png", "user_Name");
         WORLD.addUser(WORLD.my_user, WORLD.current_room);
+
+        //street room
+        let street = new Room("street","assets/street.png");
+        street.verticalOffset = 50;
+        room.addExit([-4, 25],"test");
+        room.addExit([-214,-184],street.name);
+        WORLD.addRoom(street);
     },
 
     draw: function (canvas, ctx) {
@@ -128,12 +147,31 @@ var Render = {
     drawRoom: function (ctx, room) {
         //draw room background
         var img = getImage(room.url);
-        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+        ctx.drawImage(img, -img.width / 2, (-img.height / 2) - room.verticalOffset);
 
         //draw room users
         for (let i = 0; i < room.people.length; i++) {
             this.drawUser(ctx, room.people[i]);
         }
+
+            //draw exits
+        room.exits.forEach(exit =>{
+            if(exit.active){
+                //paint exit marker when debugging
+                if(DEBUG){
+                    ctx.fillStyle = 'red';
+                    ctx.fillRect(exit.range[0], 48, Math.abs(exit.range[0]-exit.range[1]),2);
+                } 
+
+                ctx.fillStyle = 'yellow';
+                let exitText = `${exit.roomName}`;
+                ctx.fillRect(exit.range[0], EXIT_SIGN_Y, Math.abs(exit.range[0]-exit.range[1]),EXIT_SIGN_HEIGHT);
+                ctx.font= "5px Arial";
+                ctx.fillStyle = 'black';
+                ctx.fillText(exitText,exit.range[0]+1,EXIT_SIGN_Y + (EXIT_SIGN_HEIGHT/2));
+            }
+        });
+        
     },
 
     
@@ -179,7 +217,6 @@ var Render = {
         ctx.fillStyle = 'black'; 
         let nameSize = ctx.measureText(user.name);
         ctx.fillText(user.name,user.position - nameSize.width/2, 48);
-
     },
 
     update: function (dt) {
@@ -217,13 +254,22 @@ var Render = {
 
         });
 
-        //cammera centered on my_user
+        //when my user is created
         if (WORLD.my_user) {
+            //centered camera on user
             this.cam_offset = lerp(
                 this.cam_offset,
                 -WORLD.my_user.position,
                 0.07
             );
+
+            room.exits.forEach(exit =>{
+                if(WORLD.my_user.position > exit.range[0] && WORLD.my_user.position < exit.range[1]){
+                    exit.active = true;
+                }else{
+                    exit.active = false;
+                }
+            });
         }
     },
 
@@ -237,14 +283,23 @@ var Render = {
 
     onMouse: function (e) {
         if (e.type == "mousedown") {
-            //only process clicks inside canvas
-            if(mouse_pos[0]< canvas.getBoundingClientRect().width){
-                let local_pos = this.canvasToWorld([mouse_pos[0], mouse_pos[1]]); 
-                //only move when clicking inside the room verticaly
-                if(local_pos[1] > WORLD.current_room.range[2] && local_pos[1] < WORLD.current_room.range[3]){
-                    WORLD.my_user.target = clamp(local_pos[0],WORLD.current_room.range[0], WORLD.current_room.range[1]);
-                }
+            let local_pos = this.canvasToWorld([mouse_pos[0], mouse_pos[1]]); 
+            if(DEBUG){
+                console.log("x: " + local_pos[0] + ", y: " + local_pos[1]);
             }
+            //only move when clicking inside the room verticaly
+            if(local_pos[1] > WORLD.current_room.range[2] && local_pos[1] < WORLD.current_room.range[3]){
+                WORLD.my_user.target = clamp(local_pos[0],WORLD.current_room.range[0], WORLD.current_room.range[1]);
+            }
+
+            //check for click inside active exit sign
+            WORLD.current_room.exits.forEach(exit =>{
+                if(exit.active){
+                    if(local_pos[0]> exit.range[0] && local_pos[0] < exit.range[1] && local_pos[1] > EXIT_SIGN_Y && local_pos[1] < EXIT_SIGN_Y + EXIT_SIGN_HEIGHT){
+                        console.log(exit.roomName);
+                    }
+                }
+            });
             
         } else if (e.type == "mousemove") {
         } //mouseup
