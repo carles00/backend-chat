@@ -115,29 +115,19 @@ const Render = {
     room.people.forEach(user => {
       let diff = user.target - user.position
       let delta = diff
-      if (delta > 0) {
-        delta = SPEED
-      } else if (delta < -0) {
-        delta = -SPEED
-      } else {
-        delta = 0
-      }
+
+      if (delta > 0) delta = SPEED
+      else if (delta < -0) delta = -SPEED
+      else delta = 0
       
-      if (Math.abs(diff) < 1) {
-        user.position = user.target
-      } else {
-        user.position += delta * dt
-      }
-      if (delta == 0) {
-        user.animation = 'idle'
-      } else {
-        user.animation = 'walking'
-        if (delta < 1) {
-          user.facing = FACING_LEFT
-        } else {
-          user.facing = FACING_RIGHT
-        }
-      }
+      if (Math.abs(diff) < 1) user.position = user.target
+      else user.position += delta * dt
+      
+      if (delta == 0) user.animation = 'idle'
+      else user.animation = 'walking'
+      
+      if (delta < 1) user.facing = FACING_LEFT
+      else user.facing = FACING_RIGHT
     })
     //cammera centered on my_user
     if (this.my_user) {
