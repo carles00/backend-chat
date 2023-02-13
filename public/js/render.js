@@ -8,7 +8,7 @@ var TIMEOUT_MESSAGES = 10000;
 var MAX_MESSAGES = 3;
 var EXIT_SIGN_Y = -48;
 var EXIT_SIGN_HEIGHT = 10;
-var DEBUG = true;
+var DEBUG = false;
 
 function clamp(v, min, max) {
     return v < min ? min : v > max ? max : v;
@@ -48,6 +48,10 @@ class User {
             setTimeout(resolve, ms);
         })
     };
+
+    toJSOn(){
+        
+    }
 }
 
 class Room {

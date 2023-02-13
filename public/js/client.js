@@ -46,7 +46,8 @@ var CHAT = {
 			case 'text':
 				WORLD.recieveMessage(message.userName, message.content);
 				break;
-		
+			case 'target':
+				WORLD.setUserTarget(message.userName, message.content);
 			default:
 				break;
 		}
