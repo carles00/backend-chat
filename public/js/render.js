@@ -123,7 +123,6 @@ var Render = {
         //street room
         let street = new Room("street","assets/street.png");
         street.verticalOffset = 50;
-        room.addExit([-4, 25],"test");
         room.addExit([-214,-184],street.name);
         WORLD.addRoom(street);
     },
@@ -296,7 +295,9 @@ var Render = {
             WORLD.current_room.exits.forEach(exit =>{
                 if(exit.active){
                     if(local_pos[0]> exit.range[0] && local_pos[0] < exit.range[1] && local_pos[1] > EXIT_SIGN_Y && local_pos[1] < EXIT_SIGN_Y + EXIT_SIGN_HEIGHT){
-                        console.log(exit.roomName);
+                        let newRoom = WORLD.roomByID[exit.roomName];
+                        newRoom.addUser(WORLD.my_user);
+                        WORLD.current_room = newRoom;
                     }
                 }
             });
