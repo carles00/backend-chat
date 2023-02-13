@@ -6,6 +6,7 @@ var SCALE = 4;
 var SPEED = 40;
 var TIMEOUT_MESSAGES = 10000;
 var MAX_MESSAGES = 3;
+var DEBUG = false;
 
 function clamp(v, min, max) {
     return v < min ? min : v > max ? max : v;
@@ -48,12 +49,13 @@ class User {
 }
 
 class Room {
-    constructor(name) {
+    constructor(name,url,exitPositions) {
         this.id = -1;
         this.name = name;
-        this.url = null;
+        this.url = url;
         this.people = [];
         this.range = [-240, 240, -64, 64]; //left right top bottom
+        this.exitPositions = exitPositions;
     }
     
     addUser(user) {
@@ -68,12 +70,8 @@ var WORLD = {
     my_user: null,
     current_room: null,
 
-    createRoom: function (name, url) {
-        let room = new Room(name);
-        room.url = url;
-
+    addRoom: function(room){
         this.roomByID[room.name] = room;
-        return room;
     },
 
     addUser: function(user, room){
@@ -103,7 +101,9 @@ var Render = {
     },
 
     init: function () {
-        WORLD.current_room = WORLD.createRoom("hall", "room.png");
+        let room = new Room("home","room.png",[125,-125]);
+        WORLD.addRoom(room);
+        WORLD.current_room = room;
 
         WORLD.my_user = new User("user.png", "unnamed");
         WORLD.addUser(WORLD.my_user, WORLD.current_room);
