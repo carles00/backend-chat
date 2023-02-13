@@ -91,6 +91,13 @@ var WORLD = {
         room.addUser(user)
     },
 
+    createUser: function(avatarUrl, username, roomName, pos){
+        let newUser = new User(avatarUrl, username);
+        let room = this.roomByID[roomName];
+        newUser.position = pos;
+        room.addUser(newUser);
+    },
+
     getUser: function(name){
         return this.userByID[name];
     },
@@ -100,6 +107,14 @@ var WORLD = {
     },
     sendMessage: function(text){
         this.my_user.newMessage(text);
+    },
+
+    recieveMessage: function(userName, text){
+        this.userByID[userName].newMessage(text);
+    },
+
+    setUserTarget: function(userName, target){
+        this.userByID[userName].target = target;
     }
 };
 

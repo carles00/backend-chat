@@ -38,6 +38,18 @@ var CHAT = {
 		WORLD.sendMessage(messageToSend.content);
 		//TODO Send to server
 		this.input.value = '';
+	},
+
+	recieveMessage: function(id, stringMessage){
+		let message = JSON.parse(stringMessage);
+		switch (message.type) {
+			case 'text':
+				WORLD.recieveMessage(message.userName, message.content);
+				break;
+		
+			default:
+				break;
+		}
 	}
 };
 
