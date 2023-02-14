@@ -144,6 +144,8 @@ var Render = {
         street.verticalOffset = 50;
         room.addExit([-214,-184],street.name);
         WORLD.addRoom(street);
+
+        street.addExit([-214, -184], room.name);
     },
 
     draw: function (canvas, ctx) {

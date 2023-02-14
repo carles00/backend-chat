@@ -1,7 +1,3 @@
-const server = new WebSocket("ws://ecv-etic.upf.edu/node/9024/ws");
-
-const colors = ["#25d366", "#53a6fd", "#e26ab6", "#fc9775", "#ffbc38"];
-
 class Message{
 	constructor(type, content, userName){
 		this.type = type;
