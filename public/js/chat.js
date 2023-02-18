@@ -1,3 +1,7 @@
+var DEBUG = true;
+var url = DEBUG ? "ws://localhost:9024/ws" : "ws://ecv-etic.upf.edu/node/9024/ws";
+
+
 class Message{
 	constructor(type, content, userName){
 		this.type = type;
@@ -13,8 +17,11 @@ let userName = null;
 var CHAT = {
 	input: null,
     send_button: null,
+	client: null,
 
     init: function () {
+		this.client = socketClient.connect(url, "UserNeme-Room");
+
 		this.input = document.getElementById("user-input");
 		this.send_button = document.getElementById("send-btn");
 
@@ -23,9 +30,6 @@ var CHAT = {
 				this.sendMessage();
 			}
 		});
-
-		//TODO connect to server
-
 	},
 
 	sendMessage: function(){

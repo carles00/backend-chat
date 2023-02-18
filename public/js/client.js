@@ -1,3 +1,14 @@
-const socket = new WebSocket("ws://ecv-etic.upf.edu/node/9024/ws");
+var socketClient = {
+    url: null,
+    room: null,
+    socket: null,
 
 
+    connect: function(url, room){
+        this.url = url;
+        let urlString = url + '/' + room;
+        this.socket = new WebSocket(url);
+    }
+
+
+}

@@ -7,7 +7,7 @@
   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
   <!-- Title -->
-  <title>2D Chat - Login</title>
+  <title>2D Chat - Register</title>
   <!-- Favicon -->
   <link rel='icon' type='image/vnd.microsoft.icon' href='img/favicon.ico'>
   <!-- CSS -->
@@ -18,30 +18,44 @@
   <div class='login'>
     <div class='login-content'>
       <img class='login-bg' src='img/login-bg.jpg' alt='Login Background'>
-      <form class='login-form'>
-        <!-- Login title -->
+      <form action='/register' method='post' class='login-form'>
+        <!-- Register title -->
         <div>
           <h1 class='login-title'>
             <span>Welcome</span> Back
           </h1>
           <p class='login-description'>
-            Welcome! Please login to continue.
+            Welcome! Please register to continue.
           </p>
         </div>
-        <!-- Login inputs -->
+        <!-- Register inputs -->
         <div>
           <div class='login-inputs'>
             <div>
               <label class='login-label'>Username</label>
-              <input class='login-input' type='text' placeholder='Enter your username' required>
+              <input class='login-input' name='username' type='text' placeholder='Enter your username' required>
             </div>
             <div>
               <label class='login-label'>Password</label>
-              <input class='login-input' type='password' placeholder='Enter your password' required>
+              <input class='login-input' name='password' type='password' placeholder='Enter your password' required>
+            </div>
+            <div>
+              <label class='login-label'>Skin</label>
+              <select name='skin' class='login-input' required>
+                <option value='Skin 1'></option>
+                <option value='Skin 2'></option>
+              </select>
+            </div>
+            <div>
+              <label class='login-label'>Room</label>
+              <select name='room' class='login-input' required>
+                <option value='Room 1'></option>
+                <option value='Room 2'></option>
+              </select>
             </div>
           </div>
         </div>
-        <!-- Login button -->
+        <!-- Register button -->
         <div>
           <button class='login-button'>Log In</button>
         </div>
