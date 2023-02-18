@@ -3,10 +3,9 @@ const socketClient = {
     room: null,
     socket: null,
 
-
     connect: function(url, room) {
-        this.url = url;
-        let urlString = url + '/' + room;
-        this.socket = new WebSocket(url);
+        this.url = url
+        let urlString = url + '/' + room
+        this.socket = new WebSocket(url)
     }
 }
