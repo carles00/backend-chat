@@ -48,6 +48,7 @@ const Controller = {
                         newRoom.addUser(World.my_user);
                         World.current_room.exitRoom(World.my_user);
                         World.current_room = newRoom;
+                        Chat.changeRoom(World.current_room.name);
                     }
                 }
             });
@@ -93,12 +94,11 @@ const Controller = {
             );
 
             room.exits.forEach((exit) => {
-                if (
-                    World.my_user.position > exit.range[0] &&
-                    World.my_user.position < exit.range[1]
-                )
+                if (World.my_user.position > exit.range[0] && World.my_user.position < exit.range[1]){
                     exit.active = true;
-                else exit.active = false;
+                }else {
+                    exit.active = false;
+                }
             });
         }
     },

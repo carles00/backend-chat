@@ -16,9 +16,9 @@ let mouse_pos = [0, 0];
 
 const App = {
     init: function (userName, roomName, input) {
-        Controller.init(userName, roomName);
-
         Chat.init(userName, roomName, input);
+
+        Controller.init(userName, roomName);
 
         this.renderLoop();
     },

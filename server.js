@@ -13,3 +13,12 @@ const sendToRoom = (room, msg) => {
     console.log(user)
   })
 }
+
+const key = `${redisPrefix}.${userName}`
+redisClient.get(key, (err, value) => {
+  if (err) console.error(`Error getting key: ${err}`)
+  else {
+    // JSON.parse(value).room.replace(/\s/g, '').toLowerCase()
+    // JSON.parse(value).skin.replace(/\s/g, '').toLowerCase()
+  }
+})

@@ -7,6 +7,66 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const WebSocketServer = require('websocket').server
 
+class Message{
+	constructor(type, content, userName){
+		this.type = type;
+		this.content = content;
+		this.userName = userName;
+	}
+}
+class Client{
+	constructor(connection, id, roomName){
+		this.connection = connection;
+		this.userId = id;
+		this.room = roomName;
+	}
+}
+
+class Room{
+	constructor(room){
+		this.name = room;
+		this.clientsConnected = [];
+		this.url = null;
+	}
+
+	addClient(clientID) {
+		this.clientsConnected.push(clientID);
+	}
+}
+
+var chat = {
+	roomsByName: {},
+	clinetsById: {},
+	clients: [],
+
+	addRoom: function(room) {
+		this.roomsByName[room.name] = room;
+	},
+	
+	addClinet: function(client, roomName){
+		let room = this.roomsByName[roomName];
+		this.clinetsById[client.userId] = client
+		this.clients.push(client);
+		room.addClient(client.userId);
+	},
+
+	roomMessages: function(msg){
+		let userName = msg.userName;
+		let userId = msg.userId;
+		let content = msg.content;
+
+		let roomName = chat.clinetsById[userId].room;
+		let room = chat.roomsByName[roomName];
+		room.clientsConnected.forEach(client => {
+			if(client !== userId){
+				let clientToSend = chat.clinetsById[client];
+				let sysMessage = new Message(msg.type, content, userName);
+				clientToSend.connection.sendUTF(JSON.stringify(sysMessage))
+			}
+		});
+	}
+}
+
 
 /****************************/
 /* === GLOBAL VARIABLES === */
@@ -31,27 +91,43 @@ app.use(express.static('public'))
 /**************************/
 /* === WebSocket Func === */
 /**************************/
+
+
 let userID = 0
+let roomID = 0
 
-class Message{
-	constructor(type, content, id){
-		this.type = type;
-		this.content = content;
-		this.id = id;
-	}
-}
-
-wss.on('request', (req) => {
-	console.log(req.resource);
-	let connection = req.accept();
+wss.on('request', req => {
 	userID++;
+	
+	let roomName = req.resource.split('/').pop()
+	let connection = req.accept();
+	
+	if(!chat.roomsByName[roomName]){
+		let newRoom = new Room(roomName);
+		chat.addRoom(newRoom);
+	}
+	let newClient = new Client(connection, userID, roomName);
+	chat.addClinet(newClient, roomName);
+	
 	//send id to the user
 	connection.sendUTF(JSON.stringify(new Message("id",userID)));
 
 	connection.on('message', function(message){
-		console.log(message.utf8Data);
-		let sysMessage = new Message('message', message.utf8Data, userID);
-		connection.sendUTF(JSON.stringify(sysMessage));
+		let msg = JSON.parse(message.utf8Data);
+		switch(msg.type){
+			case "text":
+			case "join":
+				chat.roomMessages(msg);
+				break;
+			case "get_room_asset":
+				//console.log(message.utf8Data);
+				//TODO get asset name from database
+				//let assetMessage = new Message('room_asset', "assets/room1.png", userID);
+				//connection.sendUTF(JSON.stringify(assetMessage));
+				break;
+			default:
+				break;
+		}
 	})
 });  
 

@@ -9,6 +9,7 @@ class User {
     constructor(url, name) {
         this.avatar = url;
         this.name = name;
+        this.userID = null;
         this.position = 0;
         this.facing = FACING_FRONT;
         this.animation = "idle";
@@ -30,7 +31,16 @@ class User {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    toJSON() {}
+    toJSON() {
+        return {
+           avatar: this.avatar,
+           name: this.name,
+           position: this.position,
+           facing: this.facing,
+           target: this.target,
+           roomName: this.room 
+        }
+    }
 }
 
 class Room {
@@ -87,6 +97,7 @@ const World = {
         let newUser = new User(avatarUrl, username);
         let room = this.roomByID[roomName];
         newUser.position = pos;
+        this.userByID[newUser.name] = newUser;
         room.addUser(newUser);
     },
 
@@ -103,6 +114,7 @@ const World = {
     },
 
     recieveMessage: function (userName, text) {
+        console.log(text);
         this.userByID[userName].newMessage(text);
     },
 
