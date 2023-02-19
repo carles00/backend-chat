@@ -94,11 +94,13 @@ const World = {
     },
 
     createUser: function (avatarUrl, username, roomName, pos) {
-        let newUser = new User(avatarUrl, username);
-        let room = this.roomByID[roomName];
-        newUser.position = pos;
-        this.userByID[newUser.name] = newUser;
-        room.addUser(newUser);
+        if(!this.userByID[username]){
+            let newUser = new User(avatarUrl, username);
+            let room = this.roomByID[roomName];
+            newUser.position = pos;
+            this.userByID[newUser.name] = newUser;
+            room.addUser(newUser);
+        }
     },
 
     getUser: function (name) {
@@ -114,13 +116,20 @@ const World = {
     },
 
     recieveMessage: function (userName, text) {
-        console.log(text);
         this.userByID[userName].newMessage(text);
     },
 
     setUserTarget: function (userName, target) {
         this.userByID[userName].target = target;
     },
+
+    updateUser: function(userName, userObj){
+        let userToUpdate = this.userByID[userName];
+        userToUpdate.avatar = userObj.avatar;
+        userToUpdate.position = userObj.position;
+        userToUpdate.facing = userObj.facing;
+        userToUpdate.target = userObj.target;
+    }
 };
 
 if (typeof window == "undefined") {

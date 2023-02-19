@@ -40,6 +40,8 @@ const Chat = {
 		this.client.onId = this.onId.bind(this);
 		this.client.onMessage = this.recieveMessage.bind(this);
 		this.client.onJoin = this.onJoin.bind(this);
+		this.client.onCreateUsers = this.onCreateUsers.bind(this);
+		this.client.onRecieveUserUpdate = this.onRecieveUserUpdate.bind(this);
 
     },
 
@@ -56,6 +58,13 @@ const Chat = {
 		this.roomName = room;
 	},
 
+	sendUpdate(){
+		if(this.userId){
+			let message = new Message("send-update", World.my_user, this.userName, this.userId);
+			this.client.sendMessage(JSON.stringify(message));
+		}
+	},
+
     sendMessage: function () {
 		if(this.input.value ==='') return;
 
@@ -68,6 +77,16 @@ const Chat = {
 
 	onJoin: function(content){
 		World.createUser(content.avatar, content.name, content.roomName, content.position);
+	},
+
+	onCreateUsers: function(content){
+		content.forEach(user => {
+			World.createUser(user.avatar, user.name, user.roomName, user.position);
+		});
+	},
+
+	onRecieveUserUpdate: function(userName, content){
+		World.updateUser(userName, content);
 	},
 
     recieveMessage: function (userName, content) {

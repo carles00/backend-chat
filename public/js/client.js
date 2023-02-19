@@ -6,6 +6,8 @@ class SocketClient{
         this.onConnect = null;
         this.onMessage = null;
         this.onJoin = null;
+        this.onCreateUsers = null;
+        this.onRecieveUserUpdate = null;
     }
 
     connect(room, userName){
@@ -26,7 +28,6 @@ class SocketClient{
     }
 
     processMessageFromServer(message){
-        console.log(message);
         switch (message.type) {
             case 'id':
                 if(this.onId){
@@ -43,6 +44,16 @@ class SocketClient{
                     this.onJoin(message.content);
                 }
             break;
+            case 'create_users':
+                if(this.onCreateUsers){
+                    this.onCreateUsers(message.content);
+                }
+                break;
+            case 'recieve-update':
+                if(this.onRecieveUserUpdate){
+                    this.onRecieveUserUpdate(message.userName, message.content);
+                }
+                break;
             case 'room_asset':
                 console.log(message);
                 break;

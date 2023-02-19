@@ -1,72 +1,12 @@
 /****************************/
 /* === CommonJS MODULES === */
 /****************************/
-const http = require('http')
-const redis = require('redis')
-const express = require('express')
-const bodyParser = require('body-parser')
-const WebSocketServer = require('websocket').server
-
-class Message{
-	constructor(type, content, userName){
-		this.type = type;
-		this.content = content;
-		this.userName = userName;
-	}
-}
-class Client{
-	constructor(connection, id, roomName){
-		this.connection = connection;
-		this.userId = id;
-		this.room = roomName;
-	}
-}
-
-class Room{
-	constructor(room){
-		this.name = room;
-		this.clientsConnected = [];
-		this.url = null;
-	}
-
-	addClient(clientID) {
-		this.clientsConnected.push(clientID);
-	}
-}
-
-var chat = {
-	roomsByName: {},
-	clinetsById: {},
-	clients: [],
-
-	addRoom: function(room) {
-		this.roomsByName[room.name] = room;
-	},
-	
-	addClinet: function(client, roomName){
-		let room = this.roomsByName[roomName];
-		this.clinetsById[client.userId] = client
-		this.clients.push(client);
-		room.addClient(client.userId);
-	},
-
-	roomMessages: function(msg){
-		let userName = msg.userName;
-		let userId = msg.userId;
-		let content = msg.content;
-
-		let roomName = chat.clinetsById[userId].room;
-		let room = chat.roomsByName[roomName];
-		room.clientsConnected.forEach(client => {
-			if(client !== userId){
-				let clientToSend = chat.clinetsById[client];
-				let sysMessage = new Message(msg.type, content, userName);
-				clientToSend.connection.sendUTF(JSON.stringify(sysMessage))
-			}
-		});
-	}
-}
-
+const http = require('http');
+const redis = require('redis');
+const express = require('express');
+const bodyParser = require('body-parser');
+const WebSocketServer = require('websocket').server;
+const serverRooms = require("./serverRooms");
 
 /****************************/
 /* === GLOBAL VARIABLES === */
@@ -92,32 +32,29 @@ app.use(express.static('public'))
 /* === WebSocket Func === */
 /**************************/
 
+serverRooms.init();
 
-let userID = 0
-let roomID = 0
+let userId = 0
 
 wss.on('request', req => {
-	userID++;
+	userId++;
 	
 	let roomName = req.resource.split('/').pop()
 	let connection = req.accept();
-	
-	if(!chat.roomsByName[roomName]){
-		let newRoom = new Room(roomName);
-		chat.addRoom(newRoom);
-	}
-	let newClient = new Client(connection, userID, roomName);
-	chat.addClinet(newClient, roomName);
-	
-	//send id to the user
-	connection.sendUTF(JSON.stringify(new Message("id",userID)));
 
+	serverRooms.onUserConnected(connection, roomName, userId);
+	
 	connection.on('message', function(message){
 		let msg = JSON.parse(message.utf8Data);
 		switch(msg.type){
 			case "text":
+				serverRooms.roomMessages(msg);
+				break;
 			case "join":
-				chat.roomMessages(msg);
+				serverRooms.joinRoom(msg);
+				break;
+			case "send-update":
+				serverRooms.sendUpdate(msg);
 				break;
 			case "get_room_asset":
 				//console.log(message.utf8Data);
@@ -128,6 +65,10 @@ wss.on('request', req => {
 			default:
 				break;
 		}
+	})
+
+	connection.on('close',function(){
+		serverRooms.onUserDisconnected(connection);
 	})
 });  
 

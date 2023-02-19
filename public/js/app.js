@@ -47,6 +47,7 @@ const App = {
     },
 
     update: function (dt) {
+        Chat.sendUpdate();
         Controller.update(dt);
     },
 
