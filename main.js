@@ -28,8 +28,32 @@ const redisClient = redis.createClient({
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended:true }))
 app.use(express.static('public'))
+/**************************/
+/* === WebSocket Func === */
+/**************************/
+let userID = 0
 
-wss.on('request', () => console.log('new client connected'))  // DEBUG
+class Message{
+	constructor(type, content, id){
+		this.type = type;
+		this.content = content;
+		this.id = id;
+	}
+}
+
+wss.on('request', (req) => {
+	console.log(req.resource);
+	let connection = req.accept();
+	userID++;
+	//send id to the user
+	connection.sendUTF(JSON.stringify(new Message("id",userID)));
+
+	connection.on('message', function(message){
+		console.log(message.utf8Data);
+		let sysMessage = new Message('message', message.utf8Data, userID);
+		connection.sendUTF(JSON.stringify(sysMessage));
+	})
+});  
 
 
 /********************/
@@ -69,13 +93,14 @@ app.post('/login', async (req, res) => {
 				if (err) console.error(`Error getting key: ${err}`)
 				else {
 					const userInfo = JSON.parse(value)
-					res.redirect(`./chat.html?${userInfo.username}&${userInfo.room}`)
+					res.redirect(`./chat.html?username=${userInfo.username}&roomname=${userInfo.room}`)
 				}
 			})
 		}
 		// If not, bad credentials.
 		else console.log('Key not found')
 	})
+	
 })
 
 
