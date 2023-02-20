@@ -102,12 +102,31 @@ const World = {
   recieveMessage: function (userName, text) { this.userByID[userName].newMessage(text) },
   setUserTarget: function (userName, target) { this.userByID[userName].target = target },
 
+  setRoomAsset: function(userName, asset){
+    let roomStr = this.userByID[userName].room;
+    let room = this.roomByID[roomStr];
+
+    room.url = asset;
+  },
+
   updateUser: function(userName, userObj) {
     let userToUpdate = this.userByID[userName]
     userToUpdate.avatar = userObj.avatar
     userToUpdate.position = userObj.position
     userToUpdate.facing = userObj.facing
     userToUpdate.target = userObj.target
+  },
+
+  setUserSkin: function(userName, skin){
+    let user = this.userByID[userName];
+    user.avatar = skin;
+  },
+
+  deleteUser: function(userName){
+    let idx = this.current_room.people.indexOf(userName);
+    this.current_room.splice(idx, 1);
+
+    delete this.userByID[userName];
   }
 }
 

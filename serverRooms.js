@@ -50,18 +50,16 @@ const serverRooms = {
   },
 
   onUserConnected(connection, roomName, userId) {
-    if(!this.roomsByName[roomName]) {
-      // TODO: get room url from db
-      /*
-      (...)
-      */
+    if (!this.roomsByName[roomName]) {
       let newRoom = new Room(roomName)
-      newRoom.url = 'assets/room1.png'
+      // newRoom.url = 'assets/room1.png'
       this.addRoom(newRoom)
     }
     let newClient = new Client(connection, userId, roomName)
     this.addClient(newClient, roomName)
     
+    // console.log(this.roomsByName);
+
     // send id to the user
     connection.sendUTF(JSON.stringify(new Message('id', userId)))
   },
@@ -75,6 +73,16 @@ const serverRooms = {
         this.clients.splice(idx, 1)
       }
     })
+    //pillar room , enviar a tothom de la room que ha marxat => borrar el user de World
+    let usersInRoom = this.roomsByName[this.clientsById[userId].room].clientsConnected;
+
+    usersInRoom.forEach(otherUser => {
+      console.log(otherUser)
+      let user = this.clientsById[otherUser];
+      let deleteUserMDG = new Message('delete_user', this.clientsById[userId].userObject.userName, '')
+      user.connection.sendUTF(JSON.stringify(deleteUserMDG))
+    });
+
     if (this.clientsById[userId] && 'room' in this.clientsById[userId]) this.roomsByName[this.clientsById[userId].room].removeClient(userId)
     // let room = this.roomsByName[ this.clientsById[userId].room ]
     // room.removeClient(userId)
@@ -105,7 +113,7 @@ const serverRooms = {
 		})
 	},
 
-  joinRoom: function(msg) {
+  joinRoom: async function(msg, redisPrefix, redisClient) {
     let userName = msg.userName
 		let userId = msg.userId
 		let content = msg.content
@@ -129,13 +137,29 @@ const serverRooms = {
         }
       }   
 		})
+
+    await redisClient.connect()
+    const key = `${redisPrefix}.${userName}`
+    const userInfo = JSON.parse(await redisClient.get(key))
+    await redisClient.disconnect()
+    const roomSkin = userInfo.room.toLowerCase().replace(/\s/g, '')
+    const avatarSkin = userInfo.skin.toLowerCase().replace(/\s/g, '')
+    
+    if (!room.url) room.url = `assets/${roomSkin}.png`
+    let roomAssetMSG = new Message('room_asset', room.url, userName)
+    userClient.connection.sendUTF(JSON.stringify(roomAssetMSG))
+
+    let avatarAssetMSG = new Message('user_skin', `assets/${avatarSkin}.png`, userName)
+    userClient.connection.sendUTF(JSON.stringify(avatarAssetMSG))
   },
 
   sendUpdate: function(msg) {
     let userName = msg.userName
 		let userId = msg.userId
 		let content = msg.content
+    
     let userClient = this.clientsById[userId]
+    if(!userClient) return;
 		let roomName = userClient.room;
 		let room = this.roomsByName[roomName]
 

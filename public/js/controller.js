@@ -6,7 +6,7 @@ const Controller = {
     let room = new Room(roomName, 'assets/room1.png')
     World.addRoom(room)
     World.current_room = room
-    World.my_user = new User('assets/userA.png', userName)
+    World.my_user = new User('assets/usera.png', userName)
     World.addUser(World.my_user, World.current_room)
     // street room
     let street = new Room('street', 'assets/street.png')

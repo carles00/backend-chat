@@ -1,12 +1,12 @@
 /****************************/
 /* === CommonJS MODULES === */
 /****************************/
-const http = require('http');
-const redis = require('redis');
-const express = require('express');
-const bodyParser = require('body-parser');
+const http = require('http')
+const redis = require('redis')
+const express = require('express')
+const bodyParser = require('body-parser')
 const WebSocketServer = require('websocket').server;
-const serverRooms = require("./serverRooms");
+const serverRooms = require('./serverRooms')
 
 /****************************/
 /* === GLOBAL VARIABLES === */
@@ -49,28 +49,25 @@ wss.on('request', req => {
 		let msg = JSON.parse(message.utf8Data);
 		switch(msg.type){
 			case "text":
-				serverRooms.roomMessages(msg);
-				break;
+				serverRooms.roomMessages(msg)
+				break
 			case "join":
-				serverRooms.joinRoom(msg);
-				break;
+				serverRooms.joinRoom(msg, redisPrefix, redisClient)
+				break
 			case "send-update":
-				serverRooms.sendUpdate(msg);
-				break;
+				serverRooms.sendUpdate(msg)
+				break
 			case "get_room_asset":
-				//console.log(message.utf8Data);
-				//TODO get asset name from database
-				//let assetMessage = new Message('room_asset', "assets/room1.png", userID);
-				//connection.sendUTF(JSON.stringify(assetMessage));
-				break;
-			default:
-				break;
+				// console.log(message.utf8Data)
+				// TODO: get asset name from database
+				// let assetMessage = new Message('room_asset', "assets/room1.png", userID)
+				// connection.sendUTF(JSON.stringify(assetMessage))
+				break
+			default: break
 		}
 	})
 
-	connection.on('close', () => {
-		serverRooms.onUserDisconnected(connection)
-	})
+	connection.on('close', () => serverRooms.onUserDisconnected(connection))
 })
 
 

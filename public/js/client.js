@@ -8,6 +8,9 @@ class SocketClient {
     this.onJoin = null
     this.onCreateUsers = null
     this.onRecieveUserUpdate = null
+    this.onRecieveRoomAsset = null;
+    this.onUserSkin = null;
+    this.onDeleteUser = null
   }
 
   connect(room, userName) {
@@ -15,9 +18,12 @@ class SocketClient {
     this.socket = new WebSocket(urlString)
     this.socket.onopen = () => {
       console.log('Connected')
-      //this.sendMessage(JSON.stringify(new Message("get_room_asset", null, userName)));
     }
     this.socket.onmessage = (message) => this.processMessageFromServer(JSON.parse(message.data))
+  }
+
+  disconnect(){
+    this.socket.close();
   }
 
   waitForConnection(callback, interval) {
@@ -55,7 +61,17 @@ class SocketClient {
         if(this.onRecieveUserUpdate) this.onRecieveUserUpdate(message.userName, message.content)
         break
       case 'room_asset':
-        console.log(message)
+        if(this.onRecieveRoomAsset){
+          this.onRecieveRoomAsset(message.content);
+        }
+        break
+      case 'user_skin':
+        if(this.onUserSkin){
+          this.onUserSkin(message.content);
+        }
+        break
+      case 'delete_user':
+        if (this.onDeleteUser) this.onDeleteUser(message.content)
         break
       default: break
     }
