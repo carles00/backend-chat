@@ -9,7 +9,7 @@
   <!-- Title -->
   <title>2D Chat - Register</title>
   <!-- Favicon -->
-  <link rel='icon' type='image/vnd.microsoft.icon' href='img/favicon.ico'>
+  <link rel='icon' type='image/vnd.microsoft.icon' href='assets/favicon.ico'>
   <!-- CSS -->
   <link rel='stylesheet' type='text/css' href='css/login.css'>
 </head>
@@ -17,7 +17,7 @@
 <body>
   <div class='login'>
     <div class='login-content'>
-      <img class='login-bg' src='img/login-bg.jpg' alt='Login Background'>
+      <img class='login-bg' src='assets/login-bg.jpg' alt='Login Background'>
       <form action='/register' method='post' class='login-form'>
         <!-- Register title -->
         <div>
@@ -42,15 +42,15 @@
             <div>
               <label class='login-label'>Skin</label>
               <select name='skin' class='login-input' required>
-                <option value='User A'></option>
-                <option value='User B'></option>
+                <option value='userA'>User A</option>
+                <option value='userB'>User B</option>
               </select>
             </div>
             <div>
               <label class='login-label'>Room</label>
               <select name='room' class='login-input' required>
-                <option value='Room 1'></option>
-                <option value='Room 2'></option>
+                <option value='room1'>Room 1</option>
+                <option value='room2'>Room 2</option>
               </select>
             </div>
           </div>
@@ -59,6 +59,7 @@
         <div>
           <button class='login-button'>Log In</button>
         </div>
+        <a href='/'>Log In</a>
       </form>
     </div>
   </div>

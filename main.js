@@ -7,6 +7,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const WebSocketServer = require('websocket').server;
 const serverRooms = require("./serverRooms");
+const { client } = require('websocket');
 
 /****************************/
 /* === GLOBAL VARIABLES === */
@@ -15,7 +16,7 @@ const app = express()
 const server = http.createServer(app)
 const wss = new WebSocketServer({ httpServer:server })
 const port = process.argv[2] ? process.argv[2] : 9024
-const redisPrefix = ''
+const redisPrefix = 'ECDWYC'
 const redisClient = redis.createClient({
   host: '127.0.0.1',
   port: 6379
@@ -28,10 +29,11 @@ const redisClient = redis.createClient({
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended:true }))
 app.use(express.static('public'))
+
+
 /**************************/
 /* === WebSocket Func === */
 /**************************/
-
 serverRooms.init();
 
 let userId = 0
@@ -67,32 +69,31 @@ wss.on('request', req => {
 		}
 	})
 
-	connection.on('close',function(){
-		serverRooms.onUserDisconnected(connection);
+	connection.on('close', () => {
+		serverRooms.onUserDisconnected(connection)
 	})
-});  
+})
 
 
 /********************/
 /* === REGISTER === */
 /********************/
 app.post('/register', async (req, res) => {
+	// Sanitize username (delete '.')
+	req.body.username = req.body.username.replace(/\./g, '')
+	// Open connection to DB
+	await redisClient.connect()
+	// Check if requested user is already registered
 	const key = `${redisPrefix}.${req.body.username}`
-	// Check if key exists.
-	await redisClient.exists(key, async (err, reply) => {
-		if (err) console.error(`Error checking key: ${err}`)
-		// If already registered, redirect directly to login.
-		else if (reply === 1) {
-			res.redirect('./index.html')
-		}
-		// If not, add the key-value pair to the DB and redirect to login.
-		else {
-			const value = JSON.stringify(req.body)
-			await redisClient.put(key, value, err => {
-				if (err) console.error(`Error putting key: ${err}`)
-			})
-		}
-	})
+	if (await redisClient.get(key) === null) {
+		await redisClient.set(key, JSON.stringify(req.body))
+		await redisClient.disconnect()
+		res.send('<script>alert("User registered successfully :)"); window.location.href = "/"</script>')
+	}
+	else {
+		await redisClient.disconnect()
+		res.send('<script>alert("User already registered :/"); window.location.href = "/register.html"</script>')
+	}
 })
 
 
@@ -100,24 +101,19 @@ app.post('/register', async (req, res) => {
 /* === LOGIN === */
 /*****************/
 app.post('/login', async (req, res) => {
+	// Sanitize username (delete '.')
+	req.body.username = req.body.username.replace(/\./g, '')
+	// Open connection to DB
+	await redisClient.connect()
+	// Get user's info
 	const key = `${redisPrefix}.${req.body.username}`
-	// Check if key exists.
-	await redisClient.exists(key, async (err, reply) => {
-		if (err) console.error(`Error checking key: ${err}`)
-		// If already registered, get the user info and redirect to chat.
-		else if (reply === 1) {
-			await redisClient.get(key, (err, value) => {
-				if (err) console.error(`Error getting key: ${err}`)
-				else {
-					const userInfo = JSON.parse(value)
-					res.redirect(`./chat.html?username=${userInfo.username}&roomname=${userInfo.room}`)
-				}
-			})
-		}
-		// If not, bad credentials.
-		else console.log('Key not found')
-	})
-	
+	const userInfo = JSON.parse(await redisClient.get(key))
+	// Close connection to DB
+	await redisClient.disconnect()
+	// Validate user's info
+	const validUser = userInfo && (req.body.username === userInfo.username) && (req.body.password === userInfo.password)
+	if (validUser) res.redirect(`chat.html?username=${userInfo.username}&roomname=${userInfo.room}`)
+	else res.send('<script>alert("Credentials are incorrect :("); window.location.href = "/"</script>')
 })
 
 
