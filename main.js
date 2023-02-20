@@ -7,7 +7,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const WebSocketServer = require('websocket').server;
 const serverRooms = require("./serverRooms");
-const { client } = require('websocket');
 
 /****************************/
 /* === GLOBAL VARIABLES === */
