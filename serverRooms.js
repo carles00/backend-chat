@@ -15,7 +15,7 @@ class Client {
 }
 
 class Room {
-	constructor(room){
+	constructor(room) {
 		this.name = room
 		this.clientsConnected = []
 		this.url = null
@@ -25,13 +25,13 @@ class Room {
 		this.clientsConnected.push(clientID)
 	}
 
-    removeClient(clientId){
+    removeClient(clientId) {
         let idx = this.clientsConnected.indexOf(clientId)
 
         this.clientsConnected.splice(idx, 1)
     }
 
-    getUsersConnected(){
+    getUsersConnected() {
         let users = [];
         this.clientsConnected.forEach(c => {
             let client = serverRooms.clientsById[c]
@@ -41,7 +41,7 @@ class Room {
     }
 }
 
-var serverRooms = {
+const serverRooms = {
     roomsByName: {},
 	clientsById: {},
     clients: [],
@@ -137,25 +137,25 @@ var serverRooms = {
 		})
     },
 
-    sendUpdate: function(msg){
-        let userName = msg.userName;
-		let userId = msg.userId;
-		let content = msg.content;
+    sendUpdate: function(msg) {
+        let userName = msg.userName
+		let userId = msg.userId
+		let content = msg.content
 
         let userClient = this.clientsById[userId]
 		let roomName = userClient.room;
-		let room = this.roomsByName[roomName];
+		let room = this.roomsByName[roomName]
 
-        userClient.userObject = content;
+        userClient.userObject = content
 
         room.clientsConnected.forEach(client => {
-            let clientToSend = this.clientsById[client];
+            let clientToSend = this.clientsById[client]
 			if(client !== userId){
-				let othersMessage = new Message("recieve-update", userClient.userObject, userName);
+				let othersMessage = new Message("recieve-update", userClient.userObject, userName)
 				clientToSend.connection.sendUTF(JSON.stringify(othersMessage))
 			}  
-		});
+		})
     }
-};
+}
 
 module.exports = serverRooms;
