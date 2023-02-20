@@ -10,7 +10,7 @@ class Client {
 		this.connection = connection
 		this.userId = id
 		this.room = roomName
-        this.userObject = null
+    this.userObject = null
 	}
 }
 
@@ -21,69 +21,67 @@ class Room {
 		this.url = null
 	}
 
-	addClient(clientID) {
-		this.clientsConnected.push(clientID)
-	}
+	addClient(clientID) { this.clientsConnected.push(clientID) }
 
-    removeClient(clientId) {
-        let idx = this.clientsConnected.indexOf(clientId)
-        this.clientsConnected.splice(idx, 1)
-    }
+  removeClient(clientId) {
+    let idx = this.clientsConnected.indexOf(clientId)
+    this.clientsConnected.splice(idx, 1)
+  }
 
-    getUsersConnected() {
-        let users = []
-        this.clientsConnected.forEach(c => {
-            let client = serverRooms.clientsById[c]
-            users.push(client.userObject)
-        })
-        return users
-    }
+  getUsersConnected() {
+    let users = []
+    this.clientsConnected.forEach(c => {
+      let client = serverRooms.clientsById[c]
+      users.push(client.userObject)
+    })
+    return users
+  }
 }
 
 const serverRooms = {
-    roomsByName: {},
+  roomsByName: {},
 	clientsById: {},
-    clients: [],
+  clients: [],
 
-    init: function(){
-        let newRoom = new Room('street')
-        newRoom.url = 'assets/street.png'
-        this.addRoom(newRoom)
-    },
+  init: function() {
+    let newRoom = new Room('street')
+    newRoom.url = 'assets/street.png'
+    this.addRoom(newRoom)
+  },
 
-    onUserConnected(connection, roomName, userId) {
-        if(!this.roomsByName[roomName]) {
-            //TODO get room url from db
-            let newRoom = new Room(roomName);
-            newRoom.url = 'assets/room1.png'
-            this.addRoom(newRoom)
-        }
-        let newClient = new Client(connection, userId, roomName)
-        this.addClient(newClient, roomName)
-        
-        // send id to the user
-        connection.sendUTF(JSON.stringify(new Message("id",userId)))
-    },
+  onUserConnected(connection, roomName, userId) {
+    if(!this.roomsByName[roomName]) {
+      // TODO: get room url from db
+      /*
+      (...)
+      */
+      let newRoom = new Room(roomName)
+      newRoom.url = 'assets/room1.png'
+      this.addRoom(newRoom)
+    }
+    let newClient = new Client(connection, userId, roomName)
+    this.addClient(newClient, roomName)
+    
+    // send id to the user
+    connection.sendUTF(JSON.stringify(new Message('id', userId)))
+  },
 
-    onUserDisconnected(connection) {
-        let userId = null
-        this.clients.forEach(client => {
-            if(client.connection === connection) {
-                userId = client.userId
-                let idx = this.clients.indexOf(client.connection)
-                this.clients.splice(idx, 1)
-            }
-        })
-        if (this.clientsById[userId] && 'room' in this.clientsById[userId]) this.roomsByName[this.clientsById[userId].room].removeClient(userId)
-        // let room = this.roomsByName[ this.clientsById[userId].room ]
-        // room.removeClient(userId)
+  onUserDisconnected(connection) {
+    let userId = null
+    this.clients.forEach(client => {
+      if(client.connection === connection) {
+        userId = client.userId
+        let idx = this.clients.indexOf(client.connection)
+        this.clients.splice(idx, 1)
+      }
+    })
+    if (this.clientsById[userId] && 'room' in this.clientsById[userId]) this.roomsByName[this.clientsById[userId].room].removeClient(userId)
+    // let room = this.roomsByName[ this.clientsById[userId].room ]
+    // room.removeClient(userId)
+    delete this.clientsById[userId]
+  },
 
-        delete this.clientsById[userId]
-    },
-
-    addRoom: function(room) {
-		this.roomsByName[room.name] = room
-	},
+  addRoom: function(room) { this.roomsByName[room.name] = room },
 	
 	addClient: function(client, roomName) {
 		let room = this.roomsByName[roomName]
@@ -107,52 +105,50 @@ const serverRooms = {
 		})
 	},
 
-    joinRoom: function(msg){
-        let userName = msg.userName
+  joinRoom: function(msg) {
+    let userName = msg.userName
 		let userId = msg.userId
 		let content = msg.content
-
-        let userClient = this.clientsById[userId]
+    let userClient = this.clientsById[userId]
 		let roomName = userClient.room
 		let room = this.roomsByName[roomName]
 
-        userClient.userObject = content
+    userClient.userObject = content
 
 		room.clientsConnected.forEach(client => {
-            let clientToSend = this.clientsById[client]
+      let clientToSend = this.clientsById[client]
 			if (client !== userId) {
 				let othersMessage = new Message(msg.type, userClient.userObject, userName)
 				clientToSend.connection.sendUTF(JSON.stringify(othersMessage))
 			}
-            else {
-                let usersConnected = room.getUsersConnected()
-                if(usersConnected.length > 1) {
-                    let userMessage = new Message('create_users', room.getUsersConnected(),'')
-                    clientToSend.connection.sendUTF(JSON.stringify(userMessage))
-                }
-            }   
+      else {
+        let usersConnected = room.getUsersConnected()
+        if (usersConnected.length > 1) {
+          let userMessage = new Message('create_users', room.getUsersConnected(),'')
+          clientToSend.connection.sendUTF(JSON.stringify(userMessage))
+        }
+      }   
 		})
-    },
+  },
 
-    sendUpdate: function(msg) {
-        let userName = msg.userName
+  sendUpdate: function(msg) {
+    let userName = msg.userName
 		let userId = msg.userId
 		let content = msg.content
-
-        let userClient = this.clientsById[userId]
+    let userClient = this.clientsById[userId]
 		let roomName = userClient.room;
 		let room = this.roomsByName[roomName]
 
-        userClient.userObject = content
+    userClient.userObject = content
 
-        room.clientsConnected.forEach(client => {
-            let clientToSend = this.clientsById[client]
-			if(client !== userId){
+    room.clientsConnected.forEach(client => {
+      let clientToSend = this.clientsById[client]
+			if (client !== userId) {
 				let othersMessage = new Message("recieve-update", userClient.userObject, userName)
 				clientToSend.connection.sendUTF(JSON.stringify(othersMessage))
 			}  
 		})
-    }
+  }
 }
 
-module.exports = serverRooms;
+module.exports = serverRooms
