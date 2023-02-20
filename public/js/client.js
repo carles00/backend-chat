@@ -23,8 +23,21 @@ class SocketClient{
         }
     }
 
-    sendMessage(message){
-        this.socket.send(message);
+    waitForConnection(callback, interval) {
+        if (this.socket.readyState === 1) callback()
+        else {
+            const that = this
+            setTimeout(() => {
+                that.waitForConnection(callback, interval)
+            }, interval)
+        }
+    }
+
+    sendMessage(message, callback) {
+        this.waitForConnection(() => {
+            this.socket.send(message)
+            if (typeof callback !== 'undefined') callback()
+        }, 1000)
     }
 
     processMessageFromServer(message){

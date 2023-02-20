@@ -27,12 +27,11 @@ class Room {
 
     removeClient(clientId) {
         let idx = this.clientsConnected.indexOf(clientId)
-
         this.clientsConnected.splice(idx, 1)
     }
 
     getUsersConnected() {
-        let users = [];
+        let users = []
         this.clientsConnected.forEach(c => {
             let client = serverRooms.clientsById[c]
             users.push(client.userObject)
@@ -60,14 +59,13 @@ const serverRooms = {
             this.addRoom(newRoom)
         }
         let newClient = new Client(connection, userId, roomName)
-        this.addClinet(newClient, roomName)
+        this.addClient(newClient, roomName)
         
         // send id to the user
         connection.sendUTF(JSON.stringify(new Message("id",userId)))
     },
 
     onUserDisconnected(connection) {
-        console.log('userDisconected')
         let userId = null
         this.clients.forEach(client => {
             if(client.connection === connection) {
@@ -76,18 +74,18 @@ const serverRooms = {
                 this.clients.splice(idx, 1)
             }
         })
-        let room = this.roomsByName[ this.clientsById[userId].room ]
-        room.removeClient(userId)
+        if (this.clientsById[userId] && 'room' in this.clientsById[userId]) this.roomsByName[this.clientsById[userId].room].removeClient(userId)
+        // let room = this.roomsByName[ this.clientsById[userId].room ]
+        // room.removeClient(userId)
 
         delete this.clientsById[userId]
-        
     },
 
     addRoom: function(room) {
 		this.roomsByName[room.name] = room
 	},
 	
-	addClinet: function(client, roomName) {
+	addClient: function(client, roomName) {
 		let room = this.roomsByName[roomName]
 		this.clientsById[client.userId] = client
 		this.clients.push(client)
@@ -132,7 +130,6 @@ const serverRooms = {
                     let userMessage = new Message('create_users', room.getUsersConnected(),'')
                     clientToSend.connection.sendUTF(JSON.stringify(userMessage))
                 }
-                
             }   
 		})
     },

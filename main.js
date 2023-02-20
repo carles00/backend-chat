@@ -107,7 +107,6 @@ app.post('/login', async (req, res) => {
 	// Get user's info
 	const key = `${redisPrefix}.${req.body.username}`
 	const userInfo = JSON.parse(await redisClient.get(key))
-	console.log(userInfo)
 	// Close connection to DB
 	await redisClient.disconnect()
 	// Validate user's info
